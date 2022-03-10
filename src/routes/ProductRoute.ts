@@ -10,23 +10,19 @@ export class ProductRoute implements Route {
 
     mountRoute(application: Application): void {
         application.post(
-            '/api/v1/product/create',
+            'product/create',
             [validateJwt, checkRoleAdmin, validateSchema('productValidator')],
             this.productController.createProduct,
         );
-        application.get('/api/v1/products', [validateJwt, checkRoleAdmin], this.productController.retriveAllProducts);
-        application.get(
-            'api/v1/product/productId',
-            [validateJwt, checkRoleAdmin],
-            this.productController.retriveProduct,
-        );
+        application.get('/products', [validateJwt, checkRoleAdmin], this.productController.retriveAllProducts);
+        application.get('/product/productId', [validateJwt, checkRoleAdmin], this.productController.retriveProduct);
         application.patch(
-            '/api/v1/product/edit/productId',
+            '/product/edit/productId',
             [validateJwt, checkRoleAdmin, validateSchema('productValidator')],
             this.productController.editProduct,
         );
         application.delete(
-            '/api/v1/product/delete/productId',
+            '/product/delete/productId',
             [validateJwt, checkRoleAdmin],
             this.productController.deleteProduct,
         );

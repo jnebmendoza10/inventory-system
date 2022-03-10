@@ -10,25 +10,25 @@ export class ReviewRoute implements Route {
 
     mountRoute(application: Application): void {
         application.post(
-            '/api/v1/review/create',
+            '/review/create',
             [validateJwt, checkRoleCustomer, validateSchema('reviewValidator')],
             this.reviewController.createReview,
         );
 
         application.get(
-            '/api/v1/reviews/productId',
+            '/reviews/productId',
             [validateJwt, checkRoleAdmin],
             this.reviewController.retrieveReviewsOfProducts,
         );
 
         application.patch(
-            '/api/v1/review/edit/reviewId',
+            '/review/edit/reviewId',
             [validateJwt, checkRoleCustomer, validateSchema('reviewValidator')],
             this.reviewController.editReview,
         );
 
         application.delete(
-            '/api/v1/review/delete/reviewId',
+            '/review/delete/reviewId',
             [validateJwt, checkRoleCustomer],
             this.reviewController.removeReview,
         );

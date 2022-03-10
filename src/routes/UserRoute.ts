@@ -10,15 +10,15 @@ export class UserRoute implements Route {
 
     mountRoute(application: Application): void {
         application.post(
-            '/api/v1/user/register',
+            '/user/register',
             [validateSchema('userRegistrationValidator')],
             this.userController.createUser,
         );
 
-        application.get('/api/v1/users', [validateJwt, checkRoleAdmin], this.userController.retrieveUsers);
+        application.get('/users', [validateJwt, checkRoleAdmin], this.userController.retrieveUsers);
 
         application.patch(
-            '/api/v1/user/editPassword',
+            '/user/editPassword',
             [validateJwt, checkRoleAdminCustomer, validateSchema('userChangePasswordValidator')],
             this.userController.changePassword,
         );
