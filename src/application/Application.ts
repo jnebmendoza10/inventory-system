@@ -4,6 +4,7 @@ import { Route } from '../routes/Route';
 import sequelize from '../utils/connection';
 import hpp from 'hpp';
 import { rateLimiterHandler } from '../middlewares/rateLimiterHandler';
+import helmet from 'helmet';
 
 export class Application {
     app: express.Application = express();
@@ -23,6 +24,8 @@ export class Application {
         this.app.use(express.urlencoded({ extended: true, limit: '5kb' }));
         this.app.use(hpp({ checkBody: true, checkBodyOnlyForContentType: 'urlencoded', checkQuery: true }));
         this.app.use(rateLimiterHandler);
+        this.app.use(helmet());
+        this.app.use('/api/v1');
     }
 
     initializePort(port: number): void {
