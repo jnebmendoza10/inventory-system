@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { Product } from '../models/base/Product';
 import { ProductService } from '../services/base/ProductService';
 import { InvalidRequestError } from './errors/InvalidRequestError';
-import { NoContentError } from './errors/NoContentError';
 
 export class ProductController {
     constructor(private readonly productService: ProductService) {}
@@ -10,7 +9,7 @@ export class ProductController {
     createProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { productName, quantity } = req.body;
-            const product: Partial<Product> = {
+            const product: Omit<Product, 'id'> = {
                 name: productName,
                 quantity: parseInt(quantity),
             };
@@ -26,7 +25,7 @@ export class ProductController {
         try {
             const products = await this.productService.retrieveAllProducts();
 
-            products.length > 0 ? res.status(200).json(products) : next(new NoContentError());
+            res.status(200).json(products);
         } catch (error) {
             next(error);
         }
@@ -53,8 +52,13 @@ export class ProductController {
             if (productId === undefined) {
                 next(new InvalidRequestError());
             }
+            const { productName, quantity } = req.body;
+            const product: Omit<Product, 'id'> = {
+                name: productName,
+                quantity: parseInt(quantity),
+            };
 
-            await this.productService.editProduct(productId, req.body);
+            await this.productService.editProduct(productId, product);
 
             res.status(200).json({ message: 'Product updated successfully' });
         } catch (error) {

@@ -10,7 +10,7 @@ export class ReviewController {
         try {
             const userId = res.locals.jwtPayload.id;
             const { productId, customerComment } = req.body;
-            const review: Partial<Review> = {
+            const review: Omit<Review, 'id'> = {
                 customer: userId,
                 product: productId,
                 comment: customerComment,
@@ -32,7 +32,7 @@ export class ReviewController {
             }
             const reviews = await this.reviewService.retrieveAllReviews(productId);
 
-            reviews.length > 0 ? res.status(200).json(reviews) : next(new Error());
+            res.status(200).json(reviews);
         } catch (error) {
             next(error);
         }
