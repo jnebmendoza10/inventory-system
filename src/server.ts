@@ -15,6 +15,7 @@ import { DefaultProductService } from './services/DefaultProductService';
 import { DefaultReviewService } from './services/DefaultReviewService';
 import { DefaultUserService } from './services/DefaultUserService';
 import { BcryptPasswordService } from './services/external/BcryptPasswordService';
+import { JwtTokenService } from './services/external/JwtTokenService';
 
 const userRepository = new SqlUserRepository();
 const passwordService = new BcryptPasswordService();
@@ -32,7 +33,8 @@ const reviewService = new DefaultReviewService(reviewRepository);
 const reviewController = new ReviewController(reviewService);
 const reviewRoute = new ReviewRoute(reviewController);
 
-const authController = new AuthController(userService);
+const tokenService = new JwtTokenService();
+const authController = new AuthController(userService, tokenService);
 const authRoute = new AuthRoute(authController);
 
 const routeList: Route[] = [];
