@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { Product } from '../models/base/Product';
 import { ProductService } from '../services/base/ProductService';
+import { Logger } from '../utils/Logger';
 import { InvalidRequestError } from './errors/InvalidRequestError';
 
 export class ProductController {
-    constructor(private readonly productService: ProductService) {}
+    constructor(private readonly productService: ProductService, private readonly logger: Logger) {}
 
     createProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {

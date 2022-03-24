@@ -2,9 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import { ReviewService } from '../services/base/ReviewService';
 import { Review } from '../models/base/Review';
 import { InvalidRequestError } from './errors/InvalidRequestError';
+import { Logger } from '../utils/Logger';
 
 export class ReviewController {
-    constructor(private readonly reviewService: ReviewService) {}
+    constructor(private readonly reviewService: ReviewService, private readonly logger: Logger) {}
 
     createReview = async (req: Request, res: Response, next: NextFunction) => {
         try {

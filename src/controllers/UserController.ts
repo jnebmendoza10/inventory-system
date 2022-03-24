@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { User } from '../models/base/User';
 import { UserService } from '../services/base/UserService';
+import { Logger } from '../utils/Logger';
 
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService, private readonly logger: Logger) {}
 
     createUser = async (req: Request, res: Response, next: NextFunction) => {
         try {

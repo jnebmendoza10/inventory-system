@@ -2,11 +2,16 @@ import { UserService } from '../services/base/UserService';
 import { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import { TokenService } from '../services/external/TokenService';
+import { Logger } from '../utils/Logger';
 
 dotenv.config();
 
 export class AuthController {
-    constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {}
+    constructor(
+        private readonly userService: UserService,
+        private readonly tokenService: TokenService,
+        private readonly logger: Logger,
+    ) {}
 
     login = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -16,6 +21,7 @@ export class AuthController {
             const token = this.tokenService.sign(
                 { id: user.id, name: user.name, role: user.role },
                 secretKey as string,
+                '15m',
             );
 
             res.status(200).send(token);
@@ -30,6 +36,7 @@ export class AuthController {
             const token = this.tokenService.sign(
                 { id: res.locals.jwtPayload.id, name: res.locals.jwtPayload.name, role: res.locals.jwtPayload.role },
                 secretKey as string,
+                '1h',
             );
 
             res.status(200).send(token);
