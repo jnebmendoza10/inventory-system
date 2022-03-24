@@ -45,6 +45,7 @@
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "pino": "^7.9.1",
     "rate-limiter-flexible": "^2.3.6",
     "sequelize": "^6.16.1",
     "tedious": "^14.3.0"
