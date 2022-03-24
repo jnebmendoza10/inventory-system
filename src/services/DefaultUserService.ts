@@ -51,9 +51,8 @@ export class DefaultUserService implements UserService {
         return result;
     }
 
-    async retrieveUsers(): Promise<Partial<User[]>> {
+    async retrieveUsers(): Promise<User[]> {
         const result = await this.userRepository.getAllUsers();
-        const users = omit(result, ['username', 'password']);
-        return users;
+        return result;
     }
 }
