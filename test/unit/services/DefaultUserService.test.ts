@@ -4,6 +4,7 @@ import { UserRepository } from '../../../src/repositories/base/UserRepository';
 import { DefaultUserService } from '../../../src/services/DefaultUserService';
 import { PasswordService } from '../../../src/services/external/PasswordService';
 import { PasswordsNotMatchError } from '../../../src/services/errors/PasswordsNotMatchError';
+import { InvalidUsernamePasswordError } from '../../../src/services/errors/InvalidUsernamePasswordError';
 
 describe('DefaultUserService tests', () => {
     const mockUserRepository = mock<UserRepository>();
@@ -83,17 +84,23 @@ describe('DefaultUserService tests', () => {
                 username: 'naruto', 
                 password:'123'
             };
+            const dummyResult ={
+                id: '1', 
+                name: 'benj', 
+                role: Role.Customer,
+                username: 'naruto', 
+            }
 
             mockUserRepository.getUserByUsername.mockResolvedValueOnce(dummyUser);
             mockPasswordService.compare.mockResolvedValueOnce(true);
             const result = await defaultUserService.userLogin(username, password);
 
-            expect(result).toBe(dummyUser);
+            expect(result).toEqual(dummyResult);
             expect(mockUserRepository.getUserByUsername).toBeCalledTimes(1);
             expect(mockUserRepository.getUserByUsername).toBeCalledWith(username);
         })
 
-        it('should throw PasswordsNotMatchError if the passwords do not match', async() => {
+        it('should throw InvalidUsernamePasswordError if the passwords do not match', async() => {
             const username = 'naruto';
             const password = '123';
             const dummyUser = {
@@ -108,7 +115,7 @@ describe('DefaultUserService tests', () => {
             mockPasswordService.compare.mockResolvedValueOnce(false);
 
             await expect(defaultUserService.userLogin(username, password)).
-            rejects.toThrowError(PasswordsNotMatchError);
+            rejects.toThrowError(InvalidUsernamePasswordError);
 
         })
     })
@@ -131,8 +138,9 @@ describe('DefaultUserService tests', () => {
 
            mockUserRepository.getAllUsers.mockResolvedValueOnce(dummyUsers);
            const users = await defaultUserService.retrieveUsers();
+    
 
-           expect(users).toBe(dummyUsers);
+           expect(users).toEqual(dummyUsers);
            expect(mockUserRepository.getAllUsers).toBeCalledTimes(1);
         })
     })
