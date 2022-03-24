@@ -1,15 +1,16 @@
 import express from 'express';
 import { errorHandler } from '../middlewares/errorHandler';
 import { Route } from '../routes/Route';
-import sequelize from '../utils/connection';
+import sequelize, { checkConnection } from '../utils/connection';
 import hpp from 'hpp';
 import { rateLimiterHandler } from '../middlewares/rateLimiterHandler';
 import helmet from 'helmet';
+import { Logger } from '../utils/Logger';
 
 export class Application {
     app: express.Application = express();
 
-    constructor(private readonly routeList: Route[]) {
+    constructor(private readonly routeList: Route[], private readonly logger: Logger) {
         this.appConfig();
         this.routeConfig(routeList);
     }
@@ -31,7 +32,11 @@ export class Application {
     initializePort(port: number): void {
         this.app.listen(port, async () => {
             await sequelize.sync();
-            console.info(`Listening on port ${port}`);
+            this.logger.info(`Listening on port ${port}`);
         });
+    }
+
+    verifyConnection(): void {
+        checkConnection(this.logger);
     }
 }

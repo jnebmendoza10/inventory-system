@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
+import { Logger } from './Logger';
 
 dotenv.config();
 
@@ -9,13 +10,13 @@ const sequelize = new Sequelize(process.env.DB_NAME!, process.env.DB_USER!, proc
     dialect: 'mssql',
 });
 
-(async () => {
+export const checkConnection = async (logger: Logger) => {
     try {
         await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
-    } catch (error) {
-        console.error('Unable to connect to the database:', error);
+        logger.info('Connection has been established successfully.');
+    } catch (error: any) {
+        logger.error('Unable to connect to the database:', error);
     }
-})();
+};
 
 export default sequelize;

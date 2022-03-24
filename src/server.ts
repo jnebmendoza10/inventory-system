@@ -16,6 +16,7 @@ import { DefaultReviewService } from './services/DefaultReviewService';
 import { DefaultUserService } from './services/DefaultUserService';
 import { BcryptPasswordService } from './services/external/BcryptPasswordService';
 import { JwtTokenService } from './services/external/JwtTokenService';
+import { LoggerImpl } from './utils/LoggerImpl';
 
 const userRepository = new SqlUserRepository();
 const passwordService = new BcryptPasswordService();
@@ -43,5 +44,7 @@ routeList.push(productRoute);
 routeList.push(reviewRoute);
 routeList.push(authRoute);
 
-const application: Application = new Application(routeList);
+const logger = new LoggerImpl();
+const application: Application = new Application(routeList, logger);
 application.initializePort(4444);
+application.verifyConnection();
