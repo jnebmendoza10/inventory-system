@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { InvalidRequestError } from '../controllers/errors/InvalidRequestError';
-import { NoContentError } from '../controllers/errors/NoContentError';
 import { TooManyRequestsError } from '../controllers/errors/TooManyRequestsError';
 import { ProductNotFoundError } from '../repositories/ProductNotFoundError';
 import { InvalidUsernamePasswordError } from '../services/errors/InvalidUsernamePasswordError';
@@ -20,11 +19,6 @@ export function errorHandler(error: Error, req: Request, res: Response, next: Ne
         });
     } else if (error instanceof ProductNotFoundError) {
         res.status(404).json({
-            title: error.name,
-            message: error.message,
-        });
-    } else if (error instanceof NoContentError) {
-        res.status(204).json({
             title: error.name,
             message: error.message,
         });
