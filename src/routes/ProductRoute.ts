@@ -14,8 +14,8 @@ export class ProductRoute implements Route {
             [validateJwt, checkRoleAdmin, validateSchema('productValidator')],
             this.productController.createProduct,
         );
-        application.get('/products', [validateJwt, checkRoleAdmin], this.productController.retriveAllProducts);
-        application.get('/product/productId', [validateJwt, checkRoleAdmin], this.productController.retriveProduct);
+        application.get('/products', [validateJwt, checkRoleAdmin], this.productController.retrieveAllProducts);
+        application.get('/product/productId', [validateJwt, checkRoleAdmin], this.productController.retrieveProduct);
         application.patch(
             '/product/edit/productId',
             [validateJwt, checkRoleAdmin, validateSchema('productValidator')],
