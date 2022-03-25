@@ -18,24 +18,26 @@ import { BcryptPasswordService } from './services/external/BcryptPasswordService
 import { JwtTokenService } from './services/external/JwtTokenService';
 import { LoggerImpl } from './utils/LoggerImpl';
 
+const logger = new LoggerImpl();
+
 const userRepository = new SqlUserRepository();
 const passwordService = new BcryptPasswordService();
 const userService = new DefaultUserService(userRepository, passwordService);
-const userController = new UserController(userService);
+const userController = new UserController(userService, logger);
 const userRoute = new UserRoute(userController);
 
 const productRepository = new SqlProductRepository();
 const productService = new DefaultProductService(productRepository);
-const productController = new ProductController(productService);
+const productController = new ProductController(productService, logger);
 const productRoute = new ProductRoute(productController);
 
 const reviewRepository = new SqlReviewRepository();
 const reviewService = new DefaultReviewService(reviewRepository);
-const reviewController = new ReviewController(reviewService);
+const reviewController = new ReviewController(reviewService, logger);
 const reviewRoute = new ReviewRoute(reviewController);
 
 const tokenService = new JwtTokenService();
-const authController = new AuthController(userService, tokenService);
+const authController = new AuthController(userService, tokenService, logger);
 const authRoute = new AuthRoute(authController);
 
 const routeList: Route[] = [];
@@ -44,7 +46,6 @@ routeList.push(productRoute);
 routeList.push(reviewRoute);
 routeList.push(authRoute);
 
-const logger = new LoggerImpl();
 const application: Application = new Application(routeList, logger);
 application.initializePort(4444);
 application.verifyConnection();
