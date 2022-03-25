@@ -14,7 +14,7 @@ export class SqlUserRepository implements UserRepository {
     async getUserByUsername(userName: string): Promise<User> {
         const user = await UserModel.findOne({ where: { username: userName } });
         if (user === null) {
-            return null as any;
+            throw new UserNotFoundError();
         }
         return user;
     }
