@@ -9,6 +9,8 @@ export class ReviewController {
 
     createReview = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            this.logger.info(`Incoming ${req.method} request`, req.body);
+
             const userId = res.locals.jwtPayload.id;
             const { productId, customerComment } = req.body;
             const review: Omit<Review, 'id'> = {
@@ -20,7 +22,8 @@ export class ReviewController {
             await this.reviewService.createReview(review);
 
             res.status(201).send();
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to create a review', error);
             next(error);
         }
     };
@@ -34,13 +37,15 @@ export class ReviewController {
             const reviews = await this.reviewService.retrieveAllReviews(productId);
 
             res.status(200).json(reviews);
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to retrieve reviews of a product', error);
             next(error);
         }
     };
 
     editReview = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            this.logger.info(`Incoming ${req.method} request`, req.body);
             const { reviewId } = req.params;
             if (reviewId === undefined) {
                 next(new InvalidRequestError());
@@ -50,7 +55,8 @@ export class ReviewController {
             await this.reviewService.editReview(reviewId, comment);
 
             res.status(200).json({ message: 'Updated Successfully' });
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to update a review', error);
             next(error);
         }
     };
@@ -65,7 +71,8 @@ export class ReviewController {
             await this.reviewService.removeReview(reviewId);
 
             res.status(200).json({ message: 'Review deleted successfully' });
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to delete a review', error);
             next(error);
         }
     };

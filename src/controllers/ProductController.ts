@@ -9,6 +9,8 @@ export class ProductController {
 
     createProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            this.logger.info(`Incoming ${req.method} request`, req.body);
+
             const { productName, quantity } = req.body;
             const product: Omit<Product, 'id'> = {
                 name: productName,
@@ -17,23 +19,27 @@ export class ProductController {
             await this.productService.newProduct(product);
 
             res.status(201).json({ message: 'Product successfully created' });
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to create a product', error);
             next(error);
         }
     };
 
-    retriveAllProducts = async (req: Request, res: Response, next: NextFunction) => {
+    retrieveAllProducts = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            this.logger.info(`Incoming ${req.method} request`);
             const products = await this.productService.retrieveAllProducts();
 
             res.status(200).json(products);
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to retrieve products', error);
             next(error);
         }
     };
 
-    retriveProduct = async (req: Request, res: Response, next: NextFunction) => {
+    retrieveProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            this.logger.info(`Incoming ${req.method} request`);
             const { productId } = req.params;
             if (productId === undefined) {
                 next(new InvalidRequestError());
@@ -42,13 +48,15 @@ export class ProductController {
             const product = await this.productService.retrieveProductById(productId);
 
             res.status(200).json(product);
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to retrieve a product', error);
             next(error);
         }
     };
 
     editProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            this.logger.info(`Incoming ${req.method} request`, req.body);
             const { productId } = req.params;
             if (productId === undefined) {
                 next(new InvalidRequestError());
@@ -62,13 +70,15 @@ export class ProductController {
             await this.productService.editProduct(productId, product);
 
             res.status(200).json({ message: 'Product updated successfully' });
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to edit a product', error);
             next(error);
         }
     };
 
     deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            this.logger.info(`Incoming ${req.method} request`);
             const { productId } = req.params;
             if (productId === undefined) {
                 next(new InvalidRequestError());
@@ -77,7 +87,8 @@ export class ProductController {
             await this.productService.removeProduct(productId);
 
             res.status(200).json({ message: 'Product deleted successfully' });
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to delete a product', error);
             next(error);
         }
     };

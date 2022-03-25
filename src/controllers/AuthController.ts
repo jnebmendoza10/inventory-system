@@ -25,14 +25,15 @@ export class AuthController {
             );
 
             res.status(200).send(token);
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to login', error);
             next(error);
         }
     };
 
     refreshToken = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const secretKey = process.env.PUBLIC_KEY;
+            const secretKey = process.env.PRIVATE_KEY;
             const token = this.tokenService.sign(
                 { id: res.locals.jwtPayload.id, name: res.locals.jwtPayload.name, role: res.locals.jwtPayload.role },
                 secretKey as string,
@@ -40,7 +41,8 @@ export class AuthController {
             );
 
             res.status(200).send(token);
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to get a refresh token', error);
             next(error);
         }
     };

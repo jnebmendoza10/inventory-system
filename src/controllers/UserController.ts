@@ -19,7 +19,8 @@ export class UserController {
             await this.userService.createUser(user);
 
             res.status(201).json({ message: 'User registered successfully' });
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to create a user', error);
             next(error);
         }
     };
@@ -29,7 +30,8 @@ export class UserController {
             const users = await this.userService.retrieveUsers();
 
             res.status(200).json(users);
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to retrieve users', error);
             next(error);
         }
     };
@@ -41,7 +43,8 @@ export class UserController {
             await this.userService.changePassword(userId, oldpassword, newPassword);
 
             res.status(200).json({ message: 'Password updated successfully' });
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.error('Failed to change password', error);
             next(error);
         }
     };
