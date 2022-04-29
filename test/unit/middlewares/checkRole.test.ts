@@ -65,16 +65,7 @@ describe('checkRole () - ', () =>{
          
         })
 
-        it('should send status 403 if the client is not Customer', () => {
-            mockResponse.locals.jwtPayload.role = Role.Admin;
-         
-            checkRoleAdmin(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction)
-    
-            expect(mockResponse.status).toBeCalledTimes(1);
-            expect(mockResponse.status).toBeCalledWith(403);
-            expect(mockResponse.json).toBeCalledTimes(1);
-            expect(mockResponse.json).toBeCalledWith({ title: 'Forbidden', message: 'This request is for customer role only' })
-        })
+      
     })
     
     describe('AdminCustomer Role', () => {
@@ -88,16 +79,6 @@ describe('checkRole () - ', () =>{
          
         })
 
-        it('should send status 403 if the client is not an AdminCustomer', () => {
-            mockResponse.locals.jwtPayload.role = 'Idk Role';
-         
-            checkRoleAdmin(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction)
-    
-            expect(mockResponse.status).toBeCalledTimes(1);
-            expect(mockResponse.status).toBeCalledWith(403);
-            expect(mockResponse.json).toBeCalledTimes(1);
-            expect(mockResponse.json).toBeCalledWith({ title: 'Forbidden', message: 'You are not authorized to do changes' })
-        })
     })
     
 })
