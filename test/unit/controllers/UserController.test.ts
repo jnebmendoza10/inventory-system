@@ -37,21 +37,26 @@ describe('UserController tests', () => {
         
             res.status = jest.fn().mockReturnThis();
             res.json = jest.fn();
-
-            const dummyUser = {
+            req.body = {
                 name: 'benj', 
                 role: Role.Customer,
                 username: 'naruto', 
                 password:'123'
-            };
+            }
+            const {name, role, username, password} = req.body;
 
-            req.body = dummyUser;
+            const dummyUser = {
+                name: name, 
+                role: role,
+                username: username, 
+                password:password
+            };
 
             await userController.createUser(req, res, next)
 
             expect(next).toBeCalledTimes(0);
             expect(mockUserService.createUser).toBeCalledTimes(1);
-            expect(mockUserService.createUser).toBeCalledWith(req.body);
+            expect(mockUserService.createUser).toBeCalledWith(dummyUser);
             expect(res.status).toBeCalledTimes(1);
             expect(res.status).toBeCalledWith(201);
             expect(res.json).toBeCalledTimes(1);

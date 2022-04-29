@@ -21,18 +21,19 @@ export class ReviewController {
 
             await this.reviewService.createReview(review);
 
-            res.status(201).send();
+            res.status(201).json({ message: 'Review successfully published' });
         } catch (error: any) {
             this.logger.error('Failed to create a review', error);
             next(error);
         }
     };
 
-    retrieveReviewsOfProducts = async (req: Request, res: Response, next: NextFunction) => {
+    retrieveReviewsOfProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { productId } = req.params;
             if (productId === undefined) {
-                next(new InvalidRequestError());
+                this.logger.error('Invalid productId', productId);
+                throw new InvalidRequestError();
             }
             const reviews = await this.reviewService.retrieveAllReviews(productId);
 
@@ -48,13 +49,14 @@ export class ReviewController {
             this.logger.info(`Incoming ${req.method} request`, req.body);
             const { reviewId } = req.params;
             if (reviewId === undefined) {
-                next(new InvalidRequestError());
+                this.logger.error('Invalid reviewId', reviewId);
+                throw new InvalidRequestError();
             }
             const { comment } = req.body;
 
             await this.reviewService.editReview(reviewId, comment);
 
-            res.status(200).json({ message: 'Updated Successfully' });
+            res.status(200).json({ message: 'Updated successfully' });
         } catch (error: any) {
             this.logger.error('Failed to update a review', error);
             next(error);
@@ -65,7 +67,8 @@ export class ReviewController {
         try {
             const { reviewId } = req.params;
             if (reviewId === undefined) {
-                next(new InvalidRequestError());
+                this.logger.error('Invalid reviewId', reviewId);
+                throw new InvalidRequestError();
             }
 
             await this.reviewService.removeReview(reviewId);

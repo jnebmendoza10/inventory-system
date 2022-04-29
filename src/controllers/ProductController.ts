@@ -9,7 +9,7 @@ export class ProductController {
 
     createProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.logger.info(`Incoming ${req.method} request`, req.body);
+            //this.logger.info(`Incoming ${req.method} request`, req.body);
 
             const { productName, quantity } = req.body;
             const product: Omit<Product, 'id'> = {
@@ -42,7 +42,8 @@ export class ProductController {
             this.logger.info(`Incoming ${req.method} request`);
             const { productId } = req.params;
             if (productId === undefined) {
-                next(new InvalidRequestError());
+                this.logger.error('Invalid productId', productId);
+                throw new InvalidRequestError();
             }
 
             const product = await this.productService.retrieveProductById(productId);
@@ -56,10 +57,11 @@ export class ProductController {
 
     editProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.logger.info(`Incoming ${req.method} request`, req.body);
+            //this.logger.info(`Incoming ${req.method} request`, req.body);
             const { productId } = req.params;
             if (productId === undefined) {
-                next(new InvalidRequestError());
+                this.logger.error('Invalid productId', productId);
+                throw new InvalidRequestError();
             }
             const { productName, quantity } = req.body;
             const product: Omit<Product, 'id'> = {
@@ -81,7 +83,8 @@ export class ProductController {
             this.logger.info(`Incoming ${req.method} request`);
             const { productId } = req.params;
             if (productId === undefined) {
-                next(new InvalidRequestError());
+                this.logger.error('Invalid productId', productId);
+                throw new InvalidRequestError();
             }
 
             await this.productService.removeProduct(productId);

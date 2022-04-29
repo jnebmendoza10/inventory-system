@@ -18,7 +18,7 @@ export class ReviewRoute implements Route {
         application.get(
             '/reviews/productId',
             [validateJwt, checkRoleAdmin],
-            this.reviewController.retrieveReviewsOfProducts,
+            this.reviewController.retrieveReviewsOfProduct,
         );
 
         application.patch(

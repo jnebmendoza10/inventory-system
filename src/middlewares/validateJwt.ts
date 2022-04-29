@@ -5,16 +5,18 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export function validateJwt(req: Request, res: Response, next: NextFunction) {
-    const token = <string>req.headers['authorization'];
-    const secretKey = process.env.PRIVATE_KEY;
-    if (token === null) {
-        res.status(403).json({ title: 'Forbidden', message: 'No access token provided' });
-    }
     try {
-        const payload = jwt.verify(token, secretKey as string);
-        res.locals.jwtPayload = payload;
+        const authHeader = <string>req.headers['authorization'];
+        if (authHeader) {
+            const token = authHeader.split(' ')[1];
+            const secretKey = process.env.PRIVATE_KEY;
+            const payload = jwt.verify(token, secretKey as string);
+            res.locals.jwtPayload = payload;
+            next();
+        } else {
+            res.status(401).json({ title: 'Unauthorized', message: 'Invalid token' });
+        }
     } catch (error: any) {
         res.status(403).json({ title: error.title, message: error.message });
     }
-    next();
 }

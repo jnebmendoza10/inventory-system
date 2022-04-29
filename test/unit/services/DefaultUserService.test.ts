@@ -5,6 +5,7 @@ import { DefaultUserService } from '../../../src/services/DefaultUserService';
 import { PasswordService } from '../../../src/services/external/PasswordService';
 import { PasswordsNotMatchError } from '../../../src/services/errors/PasswordsNotMatchError';
 import { InvalidUsernamePasswordError } from '../../../src/services/errors/InvalidUsernamePasswordError';
+import { UserNameAlreadyExistsError } from '../../../src/services/errors/UserNameAlreadyExistsError';
 
 describe('DefaultUserService tests', () => {
     const mockUserRepository = mock<UserRepository>();
@@ -26,6 +27,49 @@ describe('DefaultUserService tests', () => {
             mockPasswordService
         );
     });
+
+    describe('createUser () - ', () => {
+        it('should successfully create a user', async () => {
+            const dummyUser = {
+                name: 'benj', 
+                role: Role.Customer,
+                username: 'naruto', 
+                password:'123'
+            };
+
+            mockUserRepository.getUserByUsername.mockResolvedValueOnce(null);
+
+            await defaultUserService.createUser(dummyUser);
+
+            expect(mockPasswordService.hash).toBeCalledTimes(1);
+            expect(mockPasswordService.hash).toBeCalledWith(dummyUser.password);
+            expect(mockUserRepository.getUserByUsername).toBeCalledTimes(1);
+            expect(mockUserRepository.getUserByUsername).toBeCalledWith(dummyUser.username);
+
+        })
+
+        it('should throw UserNameAlreadyExistsError if the username is already taken', async () => {
+            const dummyUser = {
+                id: '1',
+                name: 'benj', 
+                role: Role.Customer,
+                username: 'naruto', 
+                password:'123'
+            };
+
+            const dummyInput = {
+                name: 'sasuke', 
+                role: Role.Customer,
+                username: 'naruto', 
+                password:'1234'
+            }
+
+            mockUserRepository.getUserByUsername.mockResolvedValueOnce(dummyUser);
+
+            await expect( defaultUserService.createUser(dummyInput)).
+            rejects.toThrowError(UserNameAlreadyExistsError);
+        })
+    })
 
     describe('changePassword () - ', () => {
         it('should successfully change the user password', async () => {

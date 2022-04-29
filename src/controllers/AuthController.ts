@@ -31,19 +31,15 @@ export class AuthController {
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     refreshToken = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const secretKey = process.env.PRIVATE_KEY;
-            const token = this.tokenService.sign(
-                { id: res.locals.jwtPayload.id, name: res.locals.jwtPayload.name, role: res.locals.jwtPayload.role },
-                secretKey as string,
-                '1h',
-            );
+        const secretKey = process.env.PRIVATE_KEY;
+        const token = this.tokenService.sign(
+            { id: res.locals.jwtPayload.id, name: res.locals.jwtPayload.name, role: res.locals.jwtPayload.role },
+            secretKey as string,
+            '1h',
+        );
 
-            res.status(200).send(token);
-        } catch (error: any) {
-            this.logger.error('Failed to get a refresh token', error);
-            next(error);
-        }
+        res.status(200).send(token);
     };
 }

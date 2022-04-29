@@ -39,8 +39,8 @@ export class UserController {
     changePassword = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = res.locals.jwtPayload.id;
-            const { oldpassword, newPassword } = req.body;
-            await this.userService.changePassword(userId, oldpassword, newPassword);
+            const { oldPassword, newPassword } = req.body;
+            await this.userService.changePassword(userId, oldPassword, newPassword);
 
             res.status(200).json({ message: 'Password updated successfully' });
         } catch (error: any) {

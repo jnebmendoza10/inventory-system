@@ -5,14 +5,16 @@ import { Role } from "../../../src/models/enums/Role";
 import { UserService } from "../../../src/services/base/UserService";
 import { TokenService } from "../../../src/services/external/TokenService";
 import { Logger } from "../../../src/utils/Logger";
+import dotenv from 'dotenv';
 
+dotenv.config();
 
 
 describe('AuthController tests', () => {
+ 
     const req: Request = expect.any(request);
     const res: Response = expect.any(response);
     const next: NextFunction = jest.fn();
-
     let authController : AuthController;
 
     const mockUserService = mock<UserService>();
@@ -39,33 +41,35 @@ describe('AuthController tests', () => {
 
     describe('login () - ', () => {
         it('should successfully login a user', async () => {
-            res.status = jest.fn().mockReturnThis();
-            res.send = jest.fn();
-            const dummyRequest = {
+            req.body = {
                 username: 'benj',
                 password: '123'
             }
-            req.body = dummyRequest;
-            const dummyOutput = {
-                id:'1',
-                username: 'benj',
+            const {username, password} = req.body;
+            const user = {
+                id: '1',
+                name: 'benj',
                 role: Role.Customer
             }
-            const secretkey = '1234';
-            const token = mockTokenService.sign.mockReturnValueOnce('12345');
-            const time = '15m'
+            mockUserService.userLogin.mockResolvedValueOnce(user);
+            
+            const secretKey = process.env.PRIVATE_KEY;
+            mockTokenService.sign.mockReturnValueOnce('12344');
+            res.status = jest.fn().mockReturnThis();
+            res.send = jest.fn();
+            
 
             await authController.login(req, res, next);
 
             expect(next).toBeCalledTimes(0);
             expect(mockUserService.userLogin).toBeCalledTimes(1);
-            expect(mockUserService.userLogin).toBeCalledWith(req.body.username, req.body.password);
+            expect(mockUserService.userLogin).toBeCalledWith(username, password);
             expect(mockTokenService.sign).toBeCalledTimes(1);
-            expect(mockTokenService.sign).toBeCalledWith({id: dummyOutput.id, name: dummyOutput.username, role: dummyOutput.role}, secretkey, time);
+            expect(mockTokenService.sign).toBeCalledWith({id: user.id, name: user.name, role: user.role}, secretKey, '15m');
             expect(res.status).toBeCalledTimes(1);
             expect(res.status).toBeCalledWith(200);
             expect(res.send).toBeCalledTimes(1);
-            expect(res.send).toBeCalledWith(token);
+            expect(res.send).toBeCalledWith('12344');
 
         })
 
@@ -92,6 +96,7 @@ describe('AuthController tests', () => {
 
     describe('refreshToken () - ', () => {
         it('it should successfully get a refresh token when issued', async () => {
+            const secretKey = process.env.PRIVATE_KEY;
             res.locals = {
                 jwtPayload: {
                     id: '2',
@@ -101,20 +106,18 @@ describe('AuthController tests', () => {
             }
             res.status = jest.fn().mockReturnThis();
             res.send = jest.fn();
-            const secretkey = '1234';
-            const time = '1h';
-            const token = mockTokenService.sign.mockReturnValueOnce('1234');
+            mockTokenService.sign.mockReturnValueOnce('1234');
 
             await authController.refreshToken(req, res, next);
 
             expect(next).toBeCalledTimes(0);
             expect(mockTokenService.sign).toBeCalledTimes(1);
-            expect(mockTokenService.sign).toBeCalledWith({id: res.locals.jwtPayload.id, name: res.locals.jwtPayload.username, 
-                role: res.locals.jwtPayload.role}, secretkey, time);
+            expect(mockTokenService.sign).toBeCalledWith({id: res.locals.jwtPayload.id, name: res.locals.jwtPayload.name, 
+                role: res.locals.jwtPayload.role}, secretKey, '1h');
             expect(res.status).toBeCalledTimes(1);
             expect(res.status).toBeCalledWith(200);
             expect(res.send).toBeCalledTimes(1);
-            expect(res.send).toBeCalledWith(token);
+            expect(res.send).toBeCalledWith('1234');
 
         })
     })

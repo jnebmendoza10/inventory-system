@@ -35,16 +35,21 @@ describe('ProductController tests', () => {
     })
 
     describe('createReview', () => {
-        it('should successfully create a product', async () => {
+        it('should successfully create a review', async () => {
             res.locals = {
                 jwtPayload : {id: '1'}
             }
-            const dummyReview = {
-                customer: res.locals.jwtPayload.id,
-                product: '2',
-                comment: 'So good'
+            const userId = res.locals.jwtPayload.id;
+            req.body = {
+                productId: '2',
+                customerComment: 'So good'
             }
-            req.body = dummyReview;
+            const {productId, customerComment} = req.body;
+            const dummyReview = {
+                customer: userId,
+                product : productId,
+                comment: customerComment
+            };
             res.status = jest.fn().mockReturnThis();
             res.json = jest.fn()
 
@@ -52,7 +57,7 @@ describe('ProductController tests', () => {
 
             expect(next).toBeCalledTimes(0);
             expect(mockReviewService.createReview).toBeCalledTimes(1);
-            expect(mockReviewService.createReview).toBeCalledWith(req.body);
+            expect(mockReviewService.createReview).toBeCalledWith(dummyReview);
             expect(res.status).toBeCalledTimes(1);
             expect(res.status).toBeCalledWith(201);
             expect(res.json).toBeCalledTimes(1);
@@ -64,12 +69,17 @@ describe('ProductController tests', () => {
             res.locals = {
                 jwtPayload : {id: '1'}
             }
-            const dummyReview = {
-                customer: res.locals.jwtPayload.id,
-                product: '2',
-                comment: 'So good'
+            const userId = res.locals.jwtPayload.id;
+            req.body = {
+                productId: '2',
+                customerComment: 'So good'
             }
-            req.body = dummyReview;
+            const {productId, customerComment} = req.body;
+            const dummyReview = {
+                customer: userId,
+                product : productId,
+                comment: customerComment
+            };
             const error = new Error();
 
             mockReviewService.createReview.mockRejectedValueOnce(error);
@@ -77,7 +87,7 @@ describe('ProductController tests', () => {
             await reviewController.createReview(req, res, next);
 
            expect(mockReviewService.createReview).toBeCalledTimes(1);
-           expect(mockReviewService.createReview).toBeCalledWith(req.body);
+           expect(mockReviewService.createReview).toBeCalledWith(dummyReview);
            expect(mockLogger.error).toBeCalledTimes(1);
            expect(mockLogger.error).toBeCalledWith('Failed to create a review', error);
            expect(next).toBeCalledTimes(1);
@@ -119,28 +129,29 @@ describe('ProductController tests', () => {
         it('should throw an error if the productId input is invalid', async () => {
             const error = new Error();
             req.params = {
-                productId: '13123123'
+                productId: undefined
             }
 
             await reviewController.retrieveReviewsOfProduct(req, res, next);
 
-            expect(mockLogger.error).toBeCalledTimes(1);
-            expect(mockLogger.error).toBeCalledWith('Invalid reviewId', req.params.productId);
             expect(next).toBeCalledTimes(1);
-            expect(next).toBeCalledWith(new InvalidRequestError(), req.params.productId);
+            expect(next).toBeCalledWith(new InvalidRequestError());
             
         })
 
         it('should call the next function if the system failed to retrieve reviews', async () => {
             const error = new Error();
-
+            req.params = {
+                productId: '1123'
+            }
             mockReviewService.retrieveAllReviews.mockRejectedValueOnce(error);
 
             await reviewController.retrieveReviewsOfProduct(req, res, next);
 
             expect(mockReviewService.retrieveAllReviews).toBeCalledTimes(1);
+            expect(mockReviewService.retrieveAllReviews).toBeCalledWith(req.params.productId);
             expect(mockLogger.error).toBeCalledTimes(1);
-            expect(mockLogger.error).toBeCalledWith('Failed to retrieve retrieve', error);
+            expect(mockLogger.error).toBeCalledWith('Failed to retrieve reviews of a product', error);
             expect(next).toBeCalledTimes(1);
             expect(next).toBeCalledWith(error);
         })
@@ -149,21 +160,23 @@ describe('ProductController tests', () => {
 
     describe('editReview () - ', () => {
         it('should successfully edit review by id', async () => {
+            req.params = {
+                reviewId : '1'
+            }
+            const { reviewId } = req.params;
+            req.body = {
+                comment: 'so nice so good'
+            }
+            const { comment } = req.body;
             res.status = jest.fn().mockReturnThis();
             res.json = jest.fn();
-            const dummyReview = {
-                dummyReview : 'so nice so good'
-           };
-           req.body = dummyReview
-           req.params = {
-               reviewId : '1'
-           }
 
+          
            await reviewController.editReview(req, res, next);
 
            expect(next).toBeCalledTimes(0);
            expect(mockReviewService.editReview).toBeCalledTimes(1);
-           expect(mockReviewService.editReview).toBeCalledWith(req.params.reviewId, req.body);
+           expect(mockReviewService.editReview).toBeCalledWith(reviewId, comment);
            expect(res.status).toBeCalledTimes(1);
            expect(res.status).toBeCalledWith(200);
            expect(res.json).toBeCalledTimes(1);
@@ -173,36 +186,34 @@ describe('ProductController tests', () => {
         it('should throw an error if the reviewtId input is invalid', async () => {
             const error = new Error();
             req.params = {
-                productId: '13123123'
+                reviewId: undefined
             }
 
             await reviewController.editReview(req, res, next);
 
-            expect(mockLogger.error).toBeCalledTimes(1);
-            expect(mockLogger.error).toBeCalledWith('Invalid reviewId', req.params.productId);
             expect(next).toBeCalledTimes(1);
-            expect(next).toBeCalledWith(new InvalidRequestError(), req.params.productId);
+            expect(next).toBeCalledWith(new InvalidRequestError());
             
         })
 
         it('should call the next function if the system failed to edit a product', async () => {
             const error = new Error();
-            const dummyReview = {
-                dummyReview : 'so nice so good'
-           };
-           req.body = dummyReview
-           req.params = {
-               reviewId : '1'
-           }
-           req.body = dummyReview
+            req.params = {
+                reviewId : '1'
+            }
+            const { reviewId } = req.params;
+            req.body = {
+                comment: 'so nice so good'
+            }
+            const { comment } = req.body;
             mockReviewService.editReview.mockRejectedValueOnce(error);
 
             await reviewController.editReview(req, res, next);
 
             expect(mockReviewService.editReview).toBeCalledTimes(1);
-            expect(mockReviewService.editReview).toBeCalledWith(req.params.reviewId, req.body)
+            expect(mockReviewService.editReview).toBeCalledWith(reviewId, comment)
             expect(mockLogger.error).toBeCalledTimes(1);
-            expect(mockLogger.error).toBeCalledWith('Failed to edit a review', error);
+            expect(mockLogger.error).toBeCalledWith('Failed to update a review', error);
             expect(next).toBeCalledTimes(1);
             expect(next).toBeCalledWith(error);
         })
@@ -226,21 +237,19 @@ describe('ProductController tests', () => {
            expect(res.status).toBeCalledTimes(1);
            expect(res.status).toBeCalledWith(200);
            expect(res.json).toBeCalledTimes(1);
-           expect(res.json).toBeCalledWith({message: 'Product deleted successfully'});
+           expect(res.json).toBeCalledWith({message: 'Review deleted successfully'});
         })
 
         it('should throw an error if the reviewId input is invalid', async () => {
             const error = new Error();
             req.params = {
-                removeId: '13123123'
+                removeId: undefined
             }
 
             await reviewController.removeReview(req, res, next);
 
-            expect(mockLogger.error).toBeCalledTimes(1);
-            expect(mockLogger.error).toBeCalledWith('Invalid reviewId', req.params.productId);
             expect(next).toBeCalledTimes(1);
-            expect(next).toBeCalledWith(new InvalidRequestError(), req.params.productId);
+            expect(next).toBeCalledWith(new InvalidRequestError());
             
         })
 
