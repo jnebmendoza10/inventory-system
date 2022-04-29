@@ -1,17 +1,18 @@
 # inventory-system
 
-## Description
+# Description
 
 The REST API for Inventory system. This project is developed for practicing the standard conventions in developing REST API
 
-### Functionalities
+# Functionalities
 * Login
 * CRUD operation for Products
 * CRUD operation for Reviews
 * JWT Authentication
 * Role Checker
 
-## Test and coverage
+# Test and coverage
+```
 ------------------------------------|---------|----------|---------|---------|-------------------
 File                                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 ------------------------------------|---------|----------|---------|---------|-------------------
@@ -87,4 +88,4 @@ Lines        : 69.4% ( 329/474 )
 Test Suites: 15 passed, 15 total
 Tests:       84 passed, 84 total
 Snapshots:   0 total
-Time:        45.456 s
+```
